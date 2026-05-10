@@ -121,14 +121,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const parsed = GetGuidanceArgs.parse(args);
         const doc = getGuidance(parsed.reference);
         if (!doc) return errorContent(`Guidance document not found: ${parsed.reference}`);
+        const docRec = doc as unknown as Record<string, unknown>;
         return textContent({
           ...(typeof doc === 'object' ? doc : { data: doc }),
           _citation: buildCitation(
-            doc.reference || parsed.reference,
-            doc.title || doc.name || parsed.reference,
+            (docRec["reference"] as string) || parsed.reference,
+            (docRec["title"] as string) || (docRec["name"] as string) || parsed.reference,
             'be_cyber_get_guidance',
             { reference: parsed.reference },
-            doc.url || doc.source_url || null,
+            (docRec["url"] as string) || (docRec["source_url"] as string) || null,
           ),
         });
       }
@@ -141,14 +142,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const parsed = GetAdvisoryArgs.parse(args);
         const advisory = getAdvisory(parsed.reference);
         if (!advisory) return errorContent(`Advisory not found: ${parsed.reference}`);
+        const advRec = advisory as unknown as Record<string, unknown>;
         return textContent({
           ...(typeof advisory === 'object' ? advisory : { data: advisory }),
           _citation: buildCitation(
-            advisory.reference || parsed.reference,
-            advisory.title || advisory.subject || parsed.reference,
+            (advRec["reference"] as string) || parsed.reference,
+            (advRec["title"] as string) || (advRec["subject"] as string) || parsed.reference,
             'be_cyber_get_advisory',
             { reference: parsed.reference },
-            advisory.url || advisory.source_url || null,
+            (advRec["url"] as string) || (advRec["source_url"] as string) || null,
           ),
         });
       }
